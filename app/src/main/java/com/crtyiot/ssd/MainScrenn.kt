@@ -23,6 +23,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import java.lang.IllegalArgumentException
 
 
 @Composable
@@ -109,7 +110,11 @@ fun InputFx(
                 context.registerReceiver(receiver, IntentFilter("com.v.b"))
             } else if (event == Lifecycle.Event.ON_STOP) {
                 Log.i("MainScreen", "ON_STOP")
-                context.unregisterReceiver(receiver)
+                try {
+                    context.unregisterReceiver(receiver)
+                } catch (e: IllegalArgumentException) {
+                    Log.e("MainScreen-when stop", "unregisterReceiver error")
+                }
                 currentOnStop()
             }
         }
@@ -120,7 +125,11 @@ fun InputFx(
         // When the effect leaves the Composition, remove the observer
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            context.unregisterReceiver(receiver)
+            try {
+                context.unregisterReceiver(receiver)
+            } catch (e: IllegalArgumentException) {
+                Log.e("MainScreen-when Dispose", "unregisterReceiver error")
+            }
             Log.i("MainScreen", "onDispose")
         }
     }
